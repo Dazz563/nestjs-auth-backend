@@ -16,20 +16,26 @@ export class AuthService {
     async createUser(createUserdto: CreateUserDto): Promise<User> {
         let { first_name, last_name, email, password, password_confirm } = createUserdto;
 
-        if (password !== password_confirm) {
-            throw new BadRequestException('passwords do not match');
+        try {
+            if (password !== password_confirm) {
+                throw new BadRequestException('passwords do not match');
+            }
+
+            const hashed = await bcrypt.hash(password, 12);
+
+            const newUser: CreateUserDto = this.repo.create({
+                first_name,
+                last_name,
+                email,
+                password: hashed,
+            })
+
+            return await this.repo.save(newUser);
+        }
+        catch (error) {
+            throw new BadRequestException('account with this email already exists');
         }
 
-        const hashed = await bcrypt.hash(password, 12);
-
-        const newUser: CreateUserDto = this.repo.create({
-            first_name,
-            last_name,
-            email,
-            password: hashed,
-        })
-
-        return await this.repo.save(newUser);
     }
 
     async findOneBy(condition: any): Promise<User> {

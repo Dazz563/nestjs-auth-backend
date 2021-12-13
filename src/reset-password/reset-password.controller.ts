@@ -32,7 +32,7 @@ export class ResetPasswordController {
         }
     }
 
-    @Post('/reset-password')
+    @Post()
     async resetPassword(@Body() resetPasswordDto: ResetPasswordDto,): Promise<Object> {
 
         await this.resetPasswordService.resetPassword(resetPasswordDto);
